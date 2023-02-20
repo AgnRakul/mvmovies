@@ -1,6 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mvmovies/apis/api_service.dart';
-import 'package:mvmovies/model/mv_model.dart';
 
 final homeController = StateNotifierProvider<HomeController, bool>((ref) {
   return HomeController(apiService: ref.watch(apiProvider));
@@ -12,19 +13,16 @@ class HomeController extends StateNotifier<bool> {
       : _apiService = apiService,
         super(false);
 
-  List<MvModel> mvData = [];
-
-  void fetchMovies(mv) async {
+  fetchMovies(mv) async {
     state = true;
-    final res = await _apiService.fetchRequestedMovie(mv);
-    if (res.isEmpty) {
-      mvData = res;
+    try {
+      final res = await _apiService.fetchRequestedMovie(mv);
       state = false;
-    } else {
-      mvData = [];
+      log(res[0].shortName.toString());
+      return res;
+    } catch (e) {
       state = false;
+      log(e.toString());
     }
   }
 }
-
-
